@@ -19,7 +19,7 @@ def imshow_3ch_tensor(img):
     plt.show()
 
 
-def _imshow_1ch_ch(img):
+def imshow_1ch_tensor(img):
     plt.figure()
     npimg = img.numpy()
     plt.imshow(npimg, cmap="gray")
@@ -27,7 +27,7 @@ def _imshow_1ch_ch(img):
 
 
 def save_tensor_to_png(tensor, path, name):
-#  imshow(tensor)
+
     arr = np.transpose(tensor.numpy(), (1, 2, 0))
 
     if not os.path.isdir(path):
@@ -46,7 +46,7 @@ def save_copy_paste_output_dict(output_dict, main_path):
 
 
         x = output_dict["masks"]
-        save_tensor_to_png(torchvision.utils.make_grid(x[0], padding=50, pad_value=0.7, nrow=3), os.path.join(path, str(i), "masks"), str(i)+ "_all.png")
+        save_tensor_to_png(torchvision.utils.make_grid(x[i], padding=50, pad_value=0.85, nrow=3), os.path.join(path, str(i), "masks"), str(i)+ "_all.png")
 
         for j, mask in enumerate(output_dict["masks"][i]):
             save_tensor_to_png(mask, os.path.join(path, str(i), "masks"), str(i)+ "_" + str(j) + ".png")
