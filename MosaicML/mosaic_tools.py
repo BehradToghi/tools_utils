@@ -37,7 +37,7 @@ def save_tensor_to_png(tensor, path, name):
 
 
 def save_copy_paste_output_dict(output_dict, main_path):
-    path = os.path.join(main_path, "out", "no_jittering", "output_dict")
+    path = os.path.join(main_path, "out", "results")
 
     batch_size = len(output_dict["images"])
       
