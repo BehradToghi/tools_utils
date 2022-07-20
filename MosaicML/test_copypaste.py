@@ -22,7 +22,7 @@ image_path = os.path.join(data_path, "images")
 ################################
 
 configs = {
-    "convert_to_binary_mask": True,
+     "convert_to_binary_mask": True,
      "p": 1.0,
      "max_copied_instances": None,
      "area_threshold": 100,

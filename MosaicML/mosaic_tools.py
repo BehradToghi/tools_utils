@@ -121,3 +121,20 @@ def clean_axes(ax):
     ax.axes.xaxis.set_visible(False)
     ax.axis(('tight'))
     ax.set_aspect(aspect=1)
+
+
+def decompose_mask(mask):
+    parsed_mask = mask
+
+    return parsed_mask
+
+
+
+
+def parse_segmentation_batch(input_dict):
+    print("parsing")
+
+    for i, mask in enumerate(input_dict["masks"]):
+        input_dict["parsed_masks"].append(decompose_mask(mask))
+
+    return input_dict
