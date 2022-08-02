@@ -16,23 +16,25 @@ pprint(sys.path)
 ################################
 # update these paths if needed
 main_path = os.path.join(".", "tools_utils", "MosaicML", "copypaste", "files")
-data_path = os.path.join(main_path, "examples", "crevasse", "all_masks")
+# data_path = os.path.join(main_path, "examples", "crevasse", "all_masks")
+data_path = os.path.join(main_path, "examples", "tiny_ade20k_all_masks")
 ################################
 
 
-img_h = 400
-img_l = 600
+img_h = 512
+img_l = 735
 
 input_dict = {
      "masks": [],
      "parsed_masks": []
 }
 
-sample_names = [name for name in os.listdir(os.path.join(data_path, "crevasse"))]
+sample_names = [name for name in os.listdir(os.path.join(data_path, "all_masks"))]
 
-trns = transforms.Compose([transforms.Resize((img_h, img_l)), transforms.ToTensor()])
+trns = transforms.Compose([transforms.Grayscale(num_output_channels=1), transforms.Resize((img_h, img_l), interpolation=transforms.InterpolationMode.NEAREST), transforms.ToTensor()])
 
-num_instances = len([name for name in os.listdir(os.path.join(data_path, "crevasse")) if name[-3:] == "png"])
+
+num_instances = len([name for name in os.listdir(os.path.join(data_path, "all_masks")) if name[-3:] == "png"])
 
 data = datasets.ImageFolder(data_path, transform=trns)
 data_loader = torch.utils.data.DataLoader(data, batch_size=num_instances, shuffle=False)

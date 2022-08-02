@@ -16,8 +16,8 @@ pprint(sys.path)
 ################################
 # update these paths if needed
 main_path = os.path.join(".", "tools_utils", "MosaicML", "copypaste", "files")
-data_path = os.path.join(main_path, "examples", "crevasse", "data")
-masks_path = os.path.join(data_path, "masks")
+data_path = os.path.join(main_path, "examples", "r1z2_samples")
+masks_path = os.path.join(data_path, "all_masks")
 image_path = os.path.join(data_path, "images")
 ################################
 
@@ -30,38 +30,41 @@ configs = {
      "jitter_scale": (0.01, 0.99),
      "jitter_ratio": (1.0, 1.0),
      "p_flip": 1.0,
+     "bg_color": 0
 }
 
-img_h = 400
-img_l = 600
-
-input_dict = {
-     "sample_names": [],
-     "masks": [],
-     "images": []
-}
-
-sample_names = [name for name in os.listdir(data_path) if os.path.isdir(os.path.join(data_path, name))]
-
-trns = transforms.Compose([transforms.Resize((img_h, img_l)), transforms.ToTensor()])
-
-for sample_name in sample_names:
-     sample_path = os.path.join(data_path, sample_name)
-     masks_path = os.path.join(sample_path, "masks")
-     num_instances = len([name for name in os.listdir(masks_path) if name[-3:] == "png"]) + 1
-
-     data = datasets.ImageFolder(sample_path, transform=trns)
-     data_loader = torch.utils.data.DataLoader(data, batch_size=num_instances, shuffle=False)
-
-     for i, data in enumerate(data_loader):
-          input_dict["sample_names"].append(sample_name)
-          input_dict["masks"].append(data[0][1:])
-          input_dict["images"].append(data[0][0])
+img_h = 512
+img_l = 512
 
 
-output_dict = copypaste_batch(input_dict, configs)
+num_instances = len([name for name in os.listdir(os.path.join(image_path, "all")) if name[-3:] == "png"])
+images = torch.zeros(num_instances, 3, img_h, img_l)
+trns = transforms.Compose([transforms.Resize((img_h, img_l), interpolation=transforms.InterpolationMode.NEAREST), transforms.ToTensor()])
+data = datasets.ImageFolder(image_path, transform=trns)
+data_loader = torch.utils.data.DataLoader(data, batch_size=num_instances, shuffle=False)
+for i, data in enumerate(data_loader):
+     for i, image in enumerate(data[0]):
+          images[i] = image
 
-mt.save_copy_paste_output_dict(output_dict, main_path)
+
+num_instances = len([name for name in os.listdir(os.path.join(masks_path, "all")) if name[-3:] == "png"])
+masks = torch.zeros(num_instances, img_h, img_l)
+trns = transforms.Compose([transforms.Grayscale(num_output_channels=1), transforms.Resize((img_h, img_l), interpolation=transforms.InterpolationMode.NEAREST), transforms.ToTensor()])
+data = datasets.ImageFolder(masks_path, transform=trns)
+data_loader = torch.utils.data.DataLoader(data, batch_size=num_instances, shuffle=False)
+for i, data in enumerate(data_loader):
+     for i, mask in enumerate(data[0]):
+          masks[i] = mask
+
+
+# input_dict = {
+#      "images": images,
+#      "masks": masks
+# }
+
+out_images, out_masks = copypaste_batch(images, masks, configs)
+
+# mt.save_copy_paste_output_dict(output_dict, main_path)
 
 print(">>>>>INFO: Done")
 
